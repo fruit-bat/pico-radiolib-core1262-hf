@@ -28,26 +28,6 @@
 
 #include "setup.h"
 
-// include the hardware abstraction layer
-#include "hal/RPiPico/PicoHal.h"
-
-// SPI definition
-#define LORA_SCK     2
-#define LORA_MISO    4
-#define LORA_MOSI    3
-#define LORA_CS      5
-#define LORA_RST     6
-#define LORA_DIO1    20
-#define LORA_BUSY    7
-#define LORA_TXEN    21
-#define LORA_RXEN    22
-
-// define pins to be used
-#define SPI_PORT spi0
-#define SPI_RX LORA_MISO
-#define SPI_TX LORA_MOSI
-#define SPI_SCK LORA_SCK
-
 // create a new instance of the HAL class
 PicoHal* hal = new PicoHal(
   SPI_PORT,
@@ -65,17 +45,6 @@ SX1262 radio = new Module(
 );
 
 uint16_t make_radio() {
-
-  // Check this stuff is needed (perhaps it is handled in the hal)
-  gpio_init(LORA_RXEN);
-  gpio_set_dir(LORA_RXEN, GPIO_OUT);
-
-  gpio_init(LORA_TXEN);
-  gpio_set_dir(LORA_TXEN, GPIO_OUT);
-
-  // start in RX-safe state
-  gpio_put(LORA_RXEN, 1);
-  gpio_put(LORA_TXEN, 0);
 
   // Just wait a bit before using the serial output, to avoid garbled text
   hal->delay(2000);
