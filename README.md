@@ -2,6 +2,8 @@
 
 This is some experimantal work to see what can be achieved with [RadioLib](https://github.com/jgromes/RadioLib) on a Pico Pi and a [Waveshare Core1262-868M HF](https://www.waveshare.com/wiki/Core1262-868M) radio module.
 
+The project builds using the [PicoSDK](https://github.com/raspberrypi/pico-sdk).
+
 <img src="docs/breadboard_radios.jpg" width="400"/>
  
 ## Core1262 Module
@@ -53,6 +55,21 @@ Antenna control:
 | GPIO21    | TXEN     | V2           |
 | GPIO22    | RXEN     | V1           |
 
+## Build
+The RadioLib and this repository need to be fetched to a common parent folder:
+```sh
+git clone git@github.com:jgromes/RadioLib.git
+git clone git@github.com:fruit-bat/pico-radiolib-core1262-hf.git
+cd pico-radiolib-core1262-hf
+```
+
+There are a couple of script to help build the project:
+```sh
+./clean.sh
+./build.sh
+```
+
+Note that, ```sh build.sh``` is currently configured for a Pico2 board.
 
 ## Notes
 I'm still not sure if I should be using LDO or DC-DC for voltage regulation. With LDO enabled I can transmit and receive but that does not mean it is the best setup
