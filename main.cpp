@@ -26,7 +26,6 @@
 
 // https://github.com/jgromes/RadioLib/discussions/1556
 // https://files.waveshare.com/upload/c/c6/Datasheet-RTC6603SP-RichWave.pdf
-// https://www.waveshare.com/wiki/Core1262-868M?srsltid=AfmBOorHuwINCqix4I2qYEq3tzIeVDUvnDJwiwWjryIrZAl860_QI15z
 // https://www.waveshare.com/wiki/Core1262-868M
 // https://files.waveshare.com/upload/e/e1/DS_SX1261-2_V1.2.pdf
 // https://github.com/jgromes/RadioLib/discussions/1135
