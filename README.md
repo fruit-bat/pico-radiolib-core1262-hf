@@ -69,7 +69,23 @@ There are a couple of script to help build the project:
 ./build.sh
 ```
 
-Note that, ```sh build.sh``` is currently configured for a Pico2 board.
+Note that, ```build.sh``` is currently configured for a Pico2 board.
+
+If the build succeeds, it will create two executables, one configured to send and one set to receive:
+| Name | Action |
+|------|--------|
+| pico-sx1262-hx-rx.uf2 | Continuously listen for incomming messages |
+| pico-sx1262-hx-tx.uf2 | Periodically transmit a message |
+
+These need to be copied onto the Pi Pico boards.
+On the receiver:
+```sh
+cp pico-sx1262-hx-rx.uf2 /media/neo/RP2350/
+```
+On the transmitter:
+```sh
+cp pico-sx1262-hx-tx.uf2 /media/neo/RP2350/
+```
 
 ## Notes
 I'm still not sure if I should be using LDO or DC-DC for voltage regulation. With LDO enabled I can transmit and receive but that does not mean it is the best setup
