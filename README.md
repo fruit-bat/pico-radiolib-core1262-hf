@@ -1,3 +1,3 @@
 # Pi Pico Core1262-868M HF Sample Code
 
-<img src="/docs/breadboard_radios" width="400"/>
+<img src="docs/breadboard_radios.jpg" width="400"/>
