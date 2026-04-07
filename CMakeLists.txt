@@ -19,17 +19,34 @@ add_compile_options(
 set(RADIOLIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../RadioLib" ) 
 add_subdirectory("${RADIOLIB_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/RadioLib")
 
-add_executable(${PROJECT_NAME}
-    main.cpp
+set(SOURCES
     "${RADIOLIB_DIR}/src/hal/RPiPico/PicoHal.cpp"
+    setup.cpp
 )
-target_compile_definitions(${PROJECT_NAME} PUBLIC RADIOLIB_BUILD_RPI_PICO)
 
-# Pull in common dependencies
-target_link_libraries(${PROJECT_NAME} pico_stdlib hardware_spi hardware_gpio hardware_timer pico_multicore hardware_pwm RadioLib)
+add_executable(${PROJECT_NAME}-tx
+    main-tx.cpp
+    ${SOURCES}
+)
 
-pico_enable_stdio_usb(${PROJECT_NAME} 1)
-pico_enable_stdio_uart(${PROJECT_NAME} 0)
+add_executable(${PROJECT_NAME}-rx
+    main-rx.cpp
+    ${SOURCES}
+)
 
-# Create map/bin/hex file etc.
-pico_add_extra_outputs(${PROJECT_NAME})
+set(TARGETS ${PROJECT_NAME}-tx ${PROJECT_NAME}-rx)
+
+foreach(proj ${TARGETS})
+    target_compile_definitions(${proj} PUBLIC RADIOLIB_BUILD_RPI_PICO)
+
+    # Pull in common dependencies
+    target_link_libraries(${proj} pico_stdlib hardware_spi hardware_gpio hardware_timer pico_multicore hardware_pwm RadioLib)
+
+    pico_enable_stdio_usb(${proj} 1)
+    pico_enable_stdio_uart(${proj} 0)
+
+    # Create map/bin/hex file etc.
+    pico_add_extra_outputs(${proj})    
+endforeach(proj in ${TARGETS})
+
+

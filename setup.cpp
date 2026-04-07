@@ -24,26 +24,12 @@
   SOFTWARE.
 */
 
-// https://github.com/jgromes/RadioLib/discussions/1556
-// https://files.waveshare.com/upload/c/c6/Datasheet-RTC6603SP-RichWave.pdf
-// https://www.waveshare.com/wiki/Core1262-868M
-// https://files.waveshare.com/upload/e/e1/DS_SX1261-2_V1.2.pdf
-// https://github.com/jgromes/RadioLib/discussions/1135
-// https://github.com/MarusGradinaru/LoRa-Test/blob/main/src/main.cpp
-
 #include <pico/stdlib.h>
 
-// include the library
-#include <RadioLib.h>
+#include "setup.h"
 
 // include the hardware abstraction layer
 #include "hal/RPiPico/PicoHal.h"
-
-// Setup for Waveshare Core1262 HF LoRa Module, S
-// X1262 Chip, Long-Range Communication, 
-// Anti-Interference, Suitable For Sub-GHz Band, 
-// Suitable for 850~930MHz Frequency Band
-// Attempt to build for Pico2 
 
 // SPI definition
 #define LORA_SCK     2
@@ -78,10 +64,9 @@ SX1262 radio = new Module(
   LORA_BUSY
 );
 
-int main() {
+uint16_t make_radio() {
 
-  stdio_init_all();
-
+  // Check this stuff is needed (perhaps it is handled in the hal)
   gpio_init(LORA_RXEN);
   gpio_set_dir(LORA_RXEN, GPIO_OUT);
 
@@ -92,16 +77,19 @@ int main() {
   gpio_put(LORA_RXEN, 1);
   gpio_put(LORA_TXEN, 0);
 
-  // wait for a second before transmitting again
+  // Just wait a bit before using the serial output, to avoid garbled text
   hal->delay(2000);
 
-  // initialize just like with Arduino
   printf("[SX1262] Initializing ... \n");
 
-
+  // Configure the pins that are used for switching between RX and TX modes.
+  // These control the RF antenna switch on the Core1262-868M-hf LoRa module.
+  // It contains an RTC6603SP SPDT antenna switch
   radio.setRfSwitchPins(LORA_RXEN, LORA_TXEN);
-//radio.invertIQ(true);   // start false, then try true
+
+//  radio.invertIQ(true);   // start false, then try true
 //  radio.setDio1Action(IrqDio1);
+
   int16_t state = radio.begin(
     867.2, // frequency in MHz
     125.0, // bandwidth in kHz
@@ -116,92 +104,13 @@ int main() {
 
   if (state != RADIOLIB_ERR_NONE) {
     printf("failed begin, code %d\n", state);
-    return(1);
+    return 1;
   }
 
   hal->delay(10);  // after setTCXO, wait for the TCXO to stabilize before doing anything else with the radio
 
   printf("Initialise success!\n");
 
-  while(false) {
-
-    printf("[SX1262] Waiting for incoming transmission ... ");
-
-    
-    uint8_t buf[255];
-    state = radio.receive(buf, sizeof(buf), 10000);
-
-    if (state == RADIOLIB_ERR_NONE) {
-      // packet was successfully received
-      printf("%d success!\n", state);
-
-      // print the data of the packet
-     // printf("[SX1262] Data:\t\t %s\n", byteArr);
-      printf("[SX1262] HEX: ");
-      for(size_t i = 0; i < sizeof(buf); i++) {
-        printf("%02X ", buf[i]);
-      }
-      printf("\n[SX1262] ASCII: ");
-      for(size_t i = 0; i < sizeof(buf); i++) {
-        if(buf[i] >= 32 && buf[i] <= 126) {
-          printf("%c", buf[i]);
-        } else {
-          printf(".");
-        }
-      }
-      printf("\n");
-
-
-      // print the RSSI (Received Signal Strength Indicator)
-      // of the last received packet
-      printf("[SX1262] RSSI:\t\t%f dBm\n", radio.getRSSI());
-
-      // print the SNR (Signal-to-Noise Ratio)
-      // of the last received packet
-      printf("[SX1262] SNR:\t\t%f dB\n", radio.getSNR());
-
-      // print frequency error
-      printf("[SX1262] Frequency error:\t%f Hz\n", radio.getFrequencyError());
-
-    } else if (state == RADIOLIB_ERR_RX_TIMEOUT) {
-      // timeout occurred while waiting for a packet
-      printf("timeout!\n");
-
-    } else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
-      // packet was received, but is malformed
-      printf("CRC error!\n");
-
-    } else {
-      // some other error occurred
-      printf("failed, code %d\n", state);
-
-    }
-  }
-
-
-
-
-
-
-  // loop forever
-  for(;;) {
-    // send a packet
-    printf("[SX1262] Transmitting packet ... ");
-    uint8_t data[255] = "Hello World 1234567890";
-    state = radio.transmit(data, 12);
-    if(state == RADIOLIB_ERR_NONE) {
-      // the packet was successfully transmitted
-      printf("success!\n");
-
-
-    } else {
-      printf("failed, code %d\n", state);
-
-    }
-      // wait for a second before transmitting again
-      hal->delay(10000);
-
-  }
-
-  return(0);
+  return 0;
 }
+
