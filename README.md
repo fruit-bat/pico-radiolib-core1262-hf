@@ -170,13 +170,12 @@ These are sample settings that are enough to get transmission and reception work
     7,     // output power in dBm, -9 to +22
     18,    // preamble length in symbols
     1.7,   // TCXO voltage
-    true   // Use LDO regulator instead of DC-DC (SX1262 only)
+    true   // Use LDO regulator or DC-DC regulator (both seem to work)
   );
 ```
 
 ## Notes
-I'm still not sure if I should be using LDO or DC-DC for voltage regulation. With LDO enabled I can transmit and receive but that does not mean it is the best setup.
-From the circuit diagram, I think DC-DC should as well as LDO. I might investigate this a bit more.
+Both the LDO and DC-DC voltage regulation modes work fine. Perhaps there are circumstances where one is better than the other, but superficially I get similar results. 
 
 I'm not sure if the TXCO voltage should be set to 1.7v or 1.8v. I currently have it running at 1.7v
 
