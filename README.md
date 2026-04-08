@@ -58,7 +58,7 @@ Antenna control:
 | GPIO22    | RXEN     | V1           |
 
 ## Build
-The RadioLib and this repository need to be fetched to a common parent folder:
+Both the RadioLib repository and this repository need to be fetched to a common parent folder:
 ```sh
 git clone git@github.com:jgromes/RadioLib.git
 git clone git@github.com:fruit-bat/pico-radiolib-core1262-hf.git
@@ -90,15 +90,116 @@ cp pico-sx1262-hx-tx.uf2 /media/neo/RP2350/
 ```
 
 ## Notes
-I'm still not sure if I should be using LDO or DC-DC for voltage regulation. With LDO enabled I can transmit and receive but that does not mean it is the best setup
+I'm still not sure if I should be using LDO or DC-DC for voltage regulation. With LDO enabled I can transmit and receive but that does not mean it is the best setup.
+
+I'm not sure if the TXCO voltage should be set to 1.7v or 1.8v. I currently have it running at 1.7v
+
+From the circuit diagram, I think DC-DC should as well as LDO. I might investigate this a bit more.
+
+RadioLib does not seem to set the initial state of the antenna swtich pins RXEN and TXEN. This makes me nervous, so I have added a line to ```Module.cpp``` as follows:
+```cpp
+void Module::setRfSwitchPins(uint32_t rxEn, uint32_t txEn) {
+  // This can be on the stack, setRfSwitchTable copies the contents
+  const uint32_t pins[] = {
+    rxEn, txEn, RADIOLIB_NC, RADIOLIB_NC, RADIOLIB_NC,
+  };
+  
+  // This must be static, since setRfSwitchTable stores a reference.
+  static const RfSwitchMode_t table[] = {
+    { MODE_IDLE,  {this->hal->GpioLevelLow,  this->hal->GpioLevelLow} },
+    { MODE_RX,    {this->hal->GpioLevelHigh, this->hal->GpioLevelLow} },
+    { MODE_TX,    {this->hal->GpioLevelLow,  this->hal->GpioLevelHigh} },
+    END_OF_MODE_TABLE,
+  };
+  setRfSwitchTable(pins, table);
+}
+
+```
+is now:
+```cpp
+void Module::setRfSwitchPins(uint32_t rxEn, uint32_t txEn) {
+  // This can be on the stack, setRfSwitchTable copies the contents
+  const uint32_t pins[] = {
+    rxEn, txEn, RADIOLIB_NC, RADIOLIB_NC, RADIOLIB_NC,
+  };
+  
+  // This must be static, since setRfSwitchTable stores a reference.
+  static const RfSwitchMode_t table[] = {
+    { MODE_IDLE,  {this->hal->GpioLevelLow,  this->hal->GpioLevelLow} },
+    { MODE_RX,    {this->hal->GpioLevelHigh, this->hal->GpioLevelLow} },
+    { MODE_TX,    {this->hal->GpioLevelLow,  this->hal->GpioLevelHigh} },
+    END_OF_MODE_TABLE,
+  };
+  setRfSwitchTable(pins, table);
+  // set the initial state to RX (some switches do not have an idle state)
+  setRfSwitchState(MODE_RX);
+}
+```
+I may just be missing something here, I will try to get round to asking the author.
+
+In RadioLib there does not seem to be a way to initialise the sx1262 without telling it to use DIO2 as antenna control. See ```SX126x.cpp```:
+```cpp
+int16_t SX126x::begin(uint8_t cr, uint8_t syncWord, uint16_t preambleLength, float tcxoVoltage, bool useRegulatorLDO) {
+  // BW in kHz and SF are required in order to calculate LDRO for setModulationParams
+  // set the defaults, this will get overwritten later anyway
+  this->bandwidthKhz = 500.0;
+  this->spreadingFactor = 9;
+
+...
+
+  // set publicly accessible settings that are not a part of begin method
+  state = setCurrentLimit(60.0);
+  RADIOLIB_ASSERT(state);
+
+  state = setDio2AsRfSwitch(true);
+  RADIOLIB_ASSERT(state);
+
+  state = setCRC(2);
+  RADIOLIB_ASSERT(state);
+
+  state = invertIQ(false);
+  RADIOLIB_ASSERT(state);
+
+  return(state);
+}
+```
+Now, it's possible this does not matter, but it would be nice to this value, along with the other hard coded ones passed in to begin with defaults. Depending on what external circuitry is added to the module, enabling DIO2 as an output, if only briefly, might cause damage.
+
+The above code also enables CRC. In Lora mode the radio either has CRC enabled or not. Passing 0 to setCRC disables CRC. 
+
+For now I have disabled the use of DIO2 as follows:
+```cpp
+int16_t SX126x::begin(uint8_t cr, uint8_t syncWord, uint16_t preambleLength, float tcxoVoltage, bool useRegulatorLDO) {
+  // BW in kHz and SF are required in order to calculate LDRO for setModulationParams
+  // set the defaults, this will get overwritten later anyway
+  this->bandwidthKhz = 500.0;
+  this->spreadingFactor = 9;
+
+...
+
+  // set publicly accessible settings that are not a part of begin method
+  state = setCurrentLimit(60.0);
+  RADIOLIB_ASSERT(state);
+
+  state = setDio2AsRfSwitch(false); // Was true. Should be a parameter?
+  RADIOLIB_ASSERT(state);
+
+  state = setCRC(2);
+  RADIOLIB_ASSERT(state);
+
+  state = invertIQ(false);
+  RADIOLIB_ASSERT(state);
+
+  return(state);
+}
+```
+
 
 ## Pi Pico circuit diagram
 <img src="https://www.raspberrypi.com/documentation/microcontrollers/images/pico-2-r4-pinout.svg" />
 
 ## Module circuit diagram
 https://files.waveshare.com/upload/c/c1/CoreSX1262_Sch.pdf
-
-From the circuit diagram, I think DC-DC should as well as LDO. I might investigate this a bit more.
 
 ## References
 https://www.waveshare.com/wiki/Core1262-868M<br/>
