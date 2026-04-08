@@ -45,8 +45,8 @@ int main() {
   for(;;) {
     // send a packet
     printf("[SX1262] Transmitting packet ... ");
-    uint8_t data[255] = "Hello World 1234567890";
-    int16_t state = radio.transmit(data, 12);
+    uint8_t* data = (uint8_t *)"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed lorem magna, feugiat eget augue id, ultrices semper lorem. Pellentesque vitae enim mauris. Nam at massa ac urna suscipit iaculis. Cras ultrices magna sit amet est volutpat vestibulum erat curae.";
+    int16_t state = radio.transmit(data, 255);
     if(state == RADIOLIB_ERR_NONE) {
       // the packet was successfully transmitted
       printf("success!\n");

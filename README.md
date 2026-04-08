@@ -2,6 +2,8 @@
 
 This is some experimental work to see what can be achieved with [RadioLib](https://github.com/jgromes/RadioLib) on a Pico Pi wired to a [Waveshare Core1262-868M HF](https://www.waveshare.com/wiki/Core1262-868M) radio module.
 
+The [Waveshare Core1262-868M HF](https://www.waveshare.com/wiki/Core1262-868M) radio module is of interest as it contains a TCXO, which allows the stable transmission of long packets (>80 bytes). This project tests the transmission of 255 byte packets.
+
 The objective is a minimal setup to demonstrate transmission and reception.
 
 The project builds using the [PicoSDK](https://github.com/raspberrypi/pico-sdk).
@@ -98,7 +100,11 @@ cp pico-sx1262-hx-tx.uf2 /media/neo/RP2350/
 ```
 
 ## Expected results
-On the transmitter side connect to the serial over USB device and you should see the following:
+The transmitter sends a 255 byte message containing the text:
+
+*Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed lorem magna, feugiat eget augue id, ultrices semper lorem. Pellentesque vitae enim mauris. Nam at massa ac urna suscipit iaculis. Cras ultrices magna sit amet est volutpat vestibulum erat curae.*
+
+You can connect to the serial over USB device and you should see the following:
 ```
 $ tio /dev/ttyACM0
 [11:40:32.973] tio v2.7
@@ -121,13 +127,12 @@ $ tio /dev/ttyACM1
 [SX1262] Initializing ... 
 Initialise success!
 [SX1262] Waiting for incoming transmission ... 0 success!
-[SX1262] HEX: 48 65 6C 6C 6F 20 57 6F 72 6C 64 20 9C 40 FB D6 FD CE F8 71 7B 76 84 2B 09 F5 CB 1A 49 49 CE 73 C9 61 F1 1A 00 C8 EB 38 E8 9F DE 6C A7 15 15 BB 6B B5 74 0C BD 3C 27 F0 99 F3 01 9F C2 B1 15 51 6B E2 B0 E6 24 91 36 5A B7 71 1B 92 7D C8 FC 23 53 47 4F F9 33 D0 C3 4F F5 65 76 B2 31 93 C6 79 4E FB 49 58 1A 06 8E F3 ED A4 96 88 D0 A6 9F 59 85 BD A1 3B AD D3 0F 6B 5D 9C 44 1B 08 05 35 23 C4 1F 08 20 01 00 00 00 00 40 00 20 20 3F 00 20 48 04 00 00 F5 F8 00 10 00 40 00 20 00 10 00 00 38 00 00 00 40 04 00 00 B0 2B 00 20 00 00 00 00 14 00 0E 40 35 00 28 43 00 00 00 00 00 00 00 10 61 73 70 62 F9 22 00 10 40 04 00 00 40 04 00 00 B0 2B 00 20 43 E7 00 10 D8 3E 00 20 19 92 00 10 08 00 00 00 70 09 01 10 00 00 00 00 09 00 00 00 7C 09 01 10 04 00 00 00 4C 06 01 10 4C 06 01 
-[SX1262] ASCII: Hello World .@.....q{v.+....II.s.a.....8...l....k.t..<'........Qk...$.6Z.q..}..#SGO.3..O.ev.1..yN.IX...........Y...;...k].D...5#... .....@.  ?. H........@. ....8...@....+. .......@5.(C........aspb."..@...@....+. C....>. ........p...........|.......L...L..
+[SX1262] HEX: 4C 6F 72 65 6D 20 69 70 73 75 6D 20 64 6F 6C 6F 72 20 73 69 74 20 61 6D 65 74 2C 20 63 6F 6E 73 65 63 74 65 74 75 72 20 61 64 69 70 69 73 63 69 6E 67 20 65 6C 69 74 2E 20 53 65 64 20 6C 6F 72 65 6D 20 6D 61 67 6E 61 2C 20 66 65 75 67 69 61 74 20 65 67 65 74 20 61 75 67 75 65 20 69 64 2C 20 75 6C 74 72 69 63 65 73 20 73 65 6D 70 65 72 20 6C 6F 72 65 6D 2E 20 50 65 6C 6C 65 6E 74 65 73 71 75 65 20 76 69 74 61 65 20 65 6E 69 6D 20 6D 61 75 72 69 73 2E 20 4E 61 6D 20 61 74 20 6D 61 73 73 61 20 61 63 20 75 72 6E 61 20 73 75 73 63 69 70 69 74 20 69 61 63 75 6C 69 73 2E 20 43 72 61 73 20 75 6C 74 72 69 63 65 73 20 6D 61 67 6E 61 20 73 69 74 20 61 6D 65 74 20 65 73 74 20 76 6F 6C 75 74 70 61 74 20 76 65 73 74 69 62 75 6C 75 6D 20 65 72 61 74 20 63 75 72 61 65 2E 
+[SX1262] ASCII: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed lorem magna, feugiat eget augue id, ultrices semper lorem. Pellentesque vitae enim mauris. Nam at massa ac urna suscipit iaculis. Cras ultrices magna sit amet est volutpat vestibulum erat curae.
 [SX1262] RSSI:		-30.000000 dBm
 [SX1262] SNR:		12.250000 dB
 [SX1262] Frequency error:	-96.875000 Hz
 [SX1262] Waiting for incoming transmission ... 
-
 ```
 
 When working correctly, you should see values similar to:
