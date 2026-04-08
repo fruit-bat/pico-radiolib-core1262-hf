@@ -158,6 +158,11 @@ RSSI measurements are represented in decibels relative to a milliwatt (because i
 | 0–10 dB  | Normal                                |
 | <0 dB    | Weak but still decodable (LoRa magic) |
 
+### Frequency Error
+Anything less than 1Khz is fine. To put the above example into perspective:
+
+*96.875Hz / 867.2Mhz = 0.11 ppm*
+
 ## Working configuration for the Core1262-868M HF
 These are sample settings that are enough to get transmission and reception working:
 ```cpp
@@ -300,6 +305,10 @@ With the module viewed from the top with the antenna connection bottom left:
 
 ## Module circuit diagram
 https://files.waveshare.com/upload/c/c1/CoreSX1262_Sch.pdf
+
+## Troubleshooting
+* Transmitter gives error ```Error code 5 (TX timeout)```
+  * Check DIO2 wiring
 
 ## References
 https://www.waveshare.com/wiki/Core1262-868M<br/>
