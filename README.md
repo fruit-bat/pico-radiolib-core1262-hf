@@ -6,6 +6,8 @@ The objective is a minimal setup to demonstrate transmission and reception.
 
 The project builds using the [PicoSDK](https://github.com/raspberrypi/pico-sdk).
 
+If you can see mistakes or are able to suggest improvements please raise an issue; it would be nice to if this repository was useful to people. 
+
 <img src="docs/breadboard_radios.jpg" width="400"/>
  
 ## Core1262 Module
@@ -73,7 +75,7 @@ There are a couple of script to help build the project:
 
 Note that, ```build.sh``` is currently configured for a Pico2 board.
 
-If the build succeeds, it will create two executables, one configured to send and one set to receive:
+If the build succeeds, it will create two executables, one configured to send, and one set to receive:
 | Name | Action |
 |------|--------|
 | pico-sx1262-hx-rx.uf2 | Continuously listen for incoming messages |
@@ -88,6 +90,27 @@ On the transmitter:
 ```sh
 cp pico-sx1262-hx-tx.uf2 /media/neo/RP2350/
 ```
+
+## Working configuration for the Core1262-868M HF
+These are sample settings that are enough to get transmission and reception working:
+```cpp
+  // Configure the pins that are used for switching between RX and TX modes.
+  // These pins control the RF antenna switch on the Core1262-868M-hf LoRa module.
+  // It contains an RTC6603SP SPDT antenna switch
+  radio.setRfSwitchPins(LORA_RXEN, LORA_TXEN);
+
+  int16_t state = radio.begin(
+    867.2, // frequency in MHz
+    125.0, // bandwidth in kHz
+    8,     // spreading factor, 7-12 for LoRa
+    5,     // coding rate denominator, 4-8 (4 means no coding)
+    0x12,  // sync word, 0x12 for private LoRa networks, 0x34 for public LoRa networks
+    7,     // output power in dBm, -9 to +22
+    18,    // preamble length in symbols
+    1.7,   // TCXO voltage
+    true   // Use LDO regulator instead of DC-DC (SX1262 only)
+  );
+'''
 
 ## Notes
 I'm still not sure if I should be using LDO or DC-DC for voltage regulation. With LDO enabled I can transmit and receive but that does not mean it is the best setup.
@@ -163,7 +186,7 @@ int16_t SX126x::begin(uint8_t cr, uint8_t syncWord, uint16_t preambleLength, flo
   return(state);
 }
 ```
-Now, it's possible this does not matter, but it would be nice to this value, along with the other hard coded ones passed in to begin with defaults. Depending on what external circuitry is added to the module, enabling DIO2 as an output, if only briefly, might cause damage.
+Now, it's possible this does not matter, but it would be nice for this value, along with the other hard coded ones passed in to begin with defaults. Depending on what external circuitry is added to the module, enabling DIO2 as an output, if only briefly, might cause damage.
 
 The above code also enables CRC. In Lora mode the radio either has CRC enabled or not. Passing 0 to setCRC disables CRC. 
 

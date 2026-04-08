@@ -52,7 +52,7 @@ uint16_t make_radio() {
   printf("[SX1262] Initializing ... \n");
 
   // Configure the pins that are used for switching between RX and TX modes.
-  // These control the RF antenna switch on the Core1262-868M-hf LoRa module.
+  // These pins control the RF antenna switch on the Core1262-868M-hf LoRa module.
   // It contains an RTC6603SP SPDT antenna switch
   radio.setRfSwitchPins(LORA_RXEN, LORA_TXEN);
 
