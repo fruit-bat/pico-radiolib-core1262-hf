@@ -30,7 +30,13 @@ two control lines (RXEN and TXEN) which are exposed on the module. According to 
 | H    | L    | Receive   |
 | L    | H    | Transmit  |
 
-Unfortunately, this means we need two GPIO pins to control the antenna direction (correct me if I am wrong here). 
+Unlike some SX1262 designs, the RF switch is NOT controlled by DIO2.
+Instead, the module exposes RXEN and TXEN directly, so two GPIOs must be used.
+
+RadioLib supports this via:
+```cpp
+radio.setRfSwitchPins(rxEnPin, txEnPin);
+```
 
 ## Wiring
 The Pi Pico communicates with the Core1262 over SPI, and some extra GPIO pins to for flow control and antenna TX/RX.
@@ -41,7 +47,7 @@ The sample code links the Pico and Radio module on SPI 0 as follows:
 |-----------|-----------|----------|-------------|
 | GPIO2     | SPI0 CLK  | CLK      | SX1262 CLK  |
 | GPIO3     | SPI0 TX   | MOSI     | SX1262 MOSI |
-| GPIO4     | SPI0 RX   | MOSO     | SX1262 MOSO |
+| GPIO4     | SPI0 RX   | MISO     | SX1262 MISO |
 | GPIO5     | SPI0 CSn  | CS       | SX1262 CS   |
 
 The remaining SX1262 connections are as follows:
@@ -110,7 +116,7 @@ These are sample settings that are enough to get transmission and reception work
     1.7,   // TCXO voltage
     true   // Use LDO regulator instead of DC-DC (SX1262 only)
   );
-'''
+```
 
 ## Notes
 I'm still not sure if I should be using LDO or DC-DC for voltage regulation. With LDO enabled I can transmit and receive but that does not mean it is the best setup.
@@ -217,8 +223,20 @@ int16_t SX126x::begin(uint8_t cr, uint8_t syncWord, uint16_t preambleLength, flo
 }
 ```
 
+## Core1262-868M HF pinout
+With the module viewed from the top with the antenna connection bottom left:
+|  |      | |      |  |
+|--|------|-|------|--|
+| 1| BUSY | | 3V3  |16|
+| 2| RESET| | GND  |15|
+| 3| MISO | | DIO1 |14|
+| 4| MOSI | | DIO2 |13|
+| 5| CLK  | | TXEN |12|
+| 6| CS   | | RXEN |11|
+| 7| GND  | | GND  |10|
+| 8| ANT  | | GND  | 9| 
 
-## Pi Pico circuit diagram
+## Pi Pico pinout
 <img src="https://www.raspberrypi.com/documentation/microcontrollers/images/pico-2-r4-pinout.svg" />
 
 ## Module circuit diagram
