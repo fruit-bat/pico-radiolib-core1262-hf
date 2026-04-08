@@ -8,7 +8,7 @@ The objective is a minimal setup to demonstrate transmission and reception.
 
 The project builds using the [PicoSDK](https://github.com/raspberrypi/pico-sdk).
 
-If you can see mistakes or are able to suggest improvements please raise an issue; it would be nice to if this repository was useful to people other than just myself. 
+If you can see mistakes or are able to suggest improvements please raise an issue; it would be nice if this repository was useful to people other than myself. 
 
 <img src="docs/breadboard_radios.jpg" width="400"/>
  
@@ -19,7 +19,7 @@ The [Core1262 module](https://www.waveshare.com/wiki/Core1262-868M) contains:
 * An [RTC6603SP SPDT antenna switch](https://files.waveshare.com/upload/c/c6/Datasheet-RTC6603SP-RichWave.pdf)
 * Some RF conditioning circuitry
 
-I *believe*:
+It appears:
 * SX1262 DIO1 is routed solely to the DIO1 module pin 
 * SX1262 DIO2 is routed solely to the DIO2 module pin 
 * SX1262 DIO3 is used to enable the TCXO (it is connected to the Vcc pin via a ferrite).
