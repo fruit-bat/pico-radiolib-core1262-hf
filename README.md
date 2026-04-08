@@ -6,7 +6,7 @@ The objective is a minimal setup to demonstrate transmission and reception.
 
 The project builds using the [PicoSDK](https://github.com/raspberrypi/pico-sdk).
 
-If you can see mistakes or are able to suggest improvements please raise an issue; it would be nice to if this repository was useful to people. 
+If you can see mistakes or are able to suggest improvements please raise an issue; it would be nice to if this repository was useful to people other than just myself. 
 
 <img src="docs/breadboard_radios.jpg" width="400"/>
  
@@ -97,6 +97,62 @@ On the transmitter:
 cp pico-sx1262-hx-tx.uf2 /media/neo/RP2350/
 ```
 
+## Expected results
+On the transmitter side connect to the serial over USB device and you should see the following:
+```
+$ tio /dev/ttyACM0
+[11:40:32.973] tio v2.7
+[11:40:32.973] Press ctrl-t q to quit
+[11:40:32.974] Connected
+[SX1262] Initializing ... 
+Initialise success!
+[SX1262] Transmitting packet ... success!
+[SX1262] Transmitting packet ... success!
+[SX1262] Transmitting packet ... success!
+
+```
+
+On the receiver side:
+```
+$ tio /dev/ttyACM1
+[11:41:15.709] tio v2.7
+[11:41:15.709] Press ctrl-t q to quit
+[11:41:15.710] Connected
+[SX1262] Initializing ... 
+Initialise success!
+[SX1262] Waiting for incoming transmission ... 0 success!
+[SX1262] HEX: 48 65 6C 6C 6F 20 57 6F 72 6C 64 20 9C 40 FB D6 FD CE F8 71 7B 76 84 2B 09 F5 CB 1A 49 49 CE 73 C9 61 F1 1A 00 C8 EB 38 E8 9F DE 6C A7 15 15 BB 6B B5 74 0C BD 3C 27 F0 99 F3 01 9F C2 B1 15 51 6B E2 B0 E6 24 91 36 5A B7 71 1B 92 7D C8 FC 23 53 47 4F F9 33 D0 C3 4F F5 65 76 B2 31 93 C6 79 4E FB 49 58 1A 06 8E F3 ED A4 96 88 D0 A6 9F 59 85 BD A1 3B AD D3 0F 6B 5D 9C 44 1B 08 05 35 23 C4 1F 08 20 01 00 00 00 00 40 00 20 20 3F 00 20 48 04 00 00 F5 F8 00 10 00 40 00 20 00 10 00 00 38 00 00 00 40 04 00 00 B0 2B 00 20 00 00 00 00 14 00 0E 40 35 00 28 43 00 00 00 00 00 00 00 10 61 73 70 62 F9 22 00 10 40 04 00 00 40 04 00 00 B0 2B 00 20 43 E7 00 10 D8 3E 00 20 19 92 00 10 08 00 00 00 70 09 01 10 00 00 00 00 09 00 00 00 7C 09 01 10 04 00 00 00 4C 06 01 10 4C 06 01 
+[SX1262] ASCII: Hello World .@.....q{v.+....II.s.a.....8...l....k.t..<'........Qk...$.6Z.q..}..#SGO.3..O.ev.1..yN.IX...........Y...;...k].D...5#... .....@.  ?. H........@. ....8...@....+. .......@5.(C........aspb."..@...@....+. C....>. ........p...........|.......L...L..
+[SX1262] RSSI:		-30.000000 dBm
+[SX1262] SNR:		12.250000 dB
+[SX1262] Frequency error:	-96.875000 Hz
+[SX1262] Waiting for incoming transmission ... 
+
+```
+
+When working correctly, you should see values similar to:
+```
+RSSI: -20 to -40 dBm (close range)
+SNR:  10+ dB
+Frequency error: < 1 kHz
+```
+
+### RSSI (Received Signal Strength Indicator)
+RSSI measurements are represented in decibels relative to a milliwatt (because it is a logarithmic scale, a difference of 3dB represents roughly a doubling/halving of power).
+
+| RSSI              | Meaning                      |
+|-------------------|------------------------------|
+| -20 to -40 dBm	| Extremely strong (same room) |
+| -50 to -80 dBm	| Good link                    |
+| -90 to -120 dBm	| Weak / long range            |
+
+### SNR (Signal to Noise Ratio)
+| SNR      | Meaning                               |
+|----------|---------------------------------------|
+| >10 dB   | Very clean signal                     |
+| 0–10 dB  | Normal                                |
+| <0 dB    | Weak but still decodable (LoRa magic) |
+
 ## Working configuration for the Core1262-868M HF
 These are sample settings that are enough to get transmission and reception working:
 ```cpp
@@ -120,10 +176,9 @@ These are sample settings that are enough to get transmission and reception work
 
 ## Notes
 I'm still not sure if I should be using LDO or DC-DC for voltage regulation. With LDO enabled I can transmit and receive but that does not mean it is the best setup.
+From the circuit diagram, I think DC-DC should as well as LDO. I might investigate this a bit more.
 
 I'm not sure if the TXCO voltage should be set to 1.7v or 1.8v. I currently have it running at 1.7v
-
-From the circuit diagram, I think DC-DC should as well as LDO. I might investigate this a bit more.
 
 RadioLib does not seem to set the initial state of the antenna swtich pins RXEN and TXEN. This makes me nervous, so I have added a line to ```Module.cpp``` as follows:
 ```cpp
