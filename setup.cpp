@@ -60,7 +60,7 @@ uint16_t make_radio() {
 //  radio.setDio1Action(IrqDio1);
 
   int16_t state = radio.begin(
-    867.2, // frequency in MHz
+    868.2, // frequency in MHz
     125.0, // bandwidth in kHz
     8,     // spreading factor, 7-12 for LoRa
     5,     // coding rate denominator, 4-8 (4 means no coding)
