@@ -67,7 +67,7 @@ uint16_t make_radio() {
     0x12,  // sync word, 0x12 for private LoRa networks, 0x34 for public LoRa networks
     7,     // output power in dBm, -9 to +22
     18,    // preamble length in symbols
-    1.7,   // TCXO voltage
+    1.8,   // TCXO voltage
     true   // Use LDO regulator instead of DC-DC (SX1262 only)
   );
 
