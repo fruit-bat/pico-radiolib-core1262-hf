@@ -180,12 +180,12 @@ These are sample settings that are enough to get transmission and reception work
     7,     // output power in dBm, -9 to +22
     18,    // preamble length in symbols
     1.8,   // TCXO voltage
-    true   // Use LDO regulator or DC-DC regulator (both seem to work)
+    false  // Use LDO regulator or DC-DC regulator (both seem to work)
   );
 ```
 
 ## Notes
-Both the LDO and DC-DC voltage regulation modes work fine. Perhaps there are circumstances where one is better than the other, but superficially I get similar results. 
+Both the LDO and DC-DC voltage regulation modes work fine. Perhaps there are circumstances where one is better than the other, but superficially I get similar results. I would say from brief testing a better SNR is achieved with DC-DC.
 
 RadioLib does not seem to set the initial state of the antenna swtich pins RXEN and TXEN. This makes me nervous, so I have added a line to ```Module.cpp``` as follows:
 ```cpp

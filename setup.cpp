@@ -68,7 +68,7 @@ uint16_t make_radio() {
     7,     // output power in dBm, -9 to +22
     18,    // preamble length in symbols
     1.8,   // TCXO voltage
-    true   // Use LDO regulator instead of DC-DC (SX1262 only)
+    false  // Use LDO regulator instead of DC-DC (SX1262 only)
   );
 
   if (state != RADIOLIB_ERR_NONE) {
